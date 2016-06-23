@@ -6,15 +6,17 @@ package com.flatironschool.javacs;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * Provides sorting algorithms.
  *
  */
 public class ListSorter<T> {
+
+	private T[] aux;
 
 	/**
 	 * Sorts a list using a Comparator object.
@@ -63,8 +65,37 @@ public class ListSorter<T> {
 	 * @return
 	 */
 	public List<T> mergeSort(List<T> list, Comparator<T> comparator) {
-        // FILL THIS IN!
-        return null;
+        List<T> sortList=new ArrayList<T>();
+        sortList.addAll(list);
+        aux=(T[])new Object[sortList.size()];
+        Sort(sortList,0,sortList.size()-1,comparator);
+
+        return sortList;
+	}
+
+	private void Sort(List<T> a,int lo,int hi,Comparator<T> comparator){
+		if(lo>=hi) return;
+		int mid=(lo+hi)/2;
+		Sort(a,lo,mid,comparator);
+		Sort(a,mid+1,hi,comparator);
+		merge(a,lo,mid,hi,comparator);
+	}
+
+	private void merge(List<T> a,int lo,int mid,int hi,Comparator<T> comparator){
+		for(int i=lo;i<=hi;i++){
+			aux[i]=a.get(i);
+		}
+		int j=lo;
+		int k=mid+1;
+		for(int i=lo;i<=hi;i++){
+			if(j>mid) a.set(i, aux[k++]);
+			else if(k>hi) a.set(i, aux[j++]);
+			else if (comparator.compare(aux[j],aux[k])<=0) {
+				a.set(i,aux[j++]);
+			}
+			else
+				a.set(i , aux[k++]);
+		}
 	}
 
 	/**
@@ -75,7 +106,14 @@ public class ListSorter<T> {
 	 * @return
 	 */
 	public void heapSort(List<T> list, Comparator<T> comparator) {
-        // FILL THIS IN!
+        Queue<T> heap=new PriorityQueue<T>(comparator);
+        for(T token:list){
+        	heap.offer(token);
+        }
+        list.clear();
+        while(!heap.isEmpty()){
+        	list.add(heap.poll());
+        }
 	}
 
 	
@@ -89,8 +127,24 @@ public class ListSorter<T> {
 	 * @return
 	 */
 	public List<T> topK(int k, List<T> list, Comparator<T> comparator) {
-        // FILL THIS IN!
-        return null;
+		Queue<T> heap=new PriorityQueue<T>(comparator);
+        for(T token:list){
+        	if(heap.size()<k)
+        		heap.offer(token);
+        	else{
+        		T smallest=heap.peek();
+        		if(comparator.compare(token, smallest)<=0) continue;
+        		else{
+        			heap.poll();
+        			heap.offer(token);
+        		}
+        	}
+        }
+        List<T> newList=new ArrayList<>();
+        while(!heap.isEmpty()){
+        	newList.add(heap.poll());
+        }
+        return newList;
 	}
 
 	
